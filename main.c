@@ -1,57 +1,16 @@
 #include "main.h"
 
-int main(){
-   BITMAPINFOHEADER b;
-   unsigned char* bitmapData;
-   bitmapData = LoadBitmapFile("test.bmp", &b);
-   
-
-
-}
 
 //The following code is taken from http://stackoverflow.com/questions/14279242/read-bitmap-file-into-structure. 
 //I wanted to write out the program and then look at it in an attempt to learn C a little bit better.
 
-
-#pragma pack(push, 1)
-
-typedef struct tagBITMAPFILEHEADER{
-    WORD bfType; //tells you what the file type is.
-    DWORD bfSize; //Size of the bitmap file in bytes
-    WORD bfReserved1; //this is reserved. Must be 0
-    WORD bfReserved2; //this is reserved. Must be 0
-    DWORD bOffBits; //specifies the offset from the bitmapfileheader to the bitmap bits.
-}BITMAPFILEHEADER;
-    
-
-
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-typedef struct tagBITMAPINFOHEADER{
-    DWORD biSize;
-    LONG biWidth;
-    LONG biHeight;
-    WORD biPlanes;
-    WORD biBitCount;
-    DWORD biCompression;
-    DWORD BiSizeImage;
-    LONG biXPelsPerMeter;
-    LONG biYPelsPerMeter;
-    DWORD biClrUsed;
-    DWORD BiClrImportant;
-} BITMAPINFOHEADER;
-
-
-#pragma pack(pop)
-
 unsigned char *LoadBitmapFile(char *filename, BITMAPINFOHEADER *bitmapInfoHeader){
-    FILE *filePointer;
+    FILE *filePtr;
     BITMAPFILEHEADER bitmapFileHeader;
     unsigned char *bitmapImage;
     unsigned char tempRGB;
     
-    filePtr = ropen(filename,"rb");
+    filePtr = fopen(filename,"rb");
     if(filePtr == NULL){
         return NULL;
     }
@@ -70,7 +29,7 @@ unsigned char *LoadBitmapFile(char *filename, BITMAPINFOHEADER *bitmapInfoHeader
     fseek(filePtr, bitmapFileHeader.bfOffBits,SEEK_SET);
 
     //Then it's important to allocate enough memory for the bitmap image itself.
-    biitmapImage = (unsigned char*)malloc(bitmapInfoHeader->biSizeImage);
+    bitmapImage = (unsigned char*)malloc(bitmapInfoHeader->biSizeImage);
 
     if(!bitmapImage){
         //if it's 0,
@@ -78,8 +37,9 @@ unsigned char *LoadBitmapFile(char *filename, BITMAPINFOHEADER *bitmapInfoHeader
         fclose(filePtr);
         return NULL;
     }
+    int amountOfElements = bitmapInfoHeader->biSizeImage / 8;
     //now we actually read the bitmap data.
-    fread(bitmapImage,bitmapInfoHeader->biSizeImage,filePtr);
+    fread(bitmapImage,bitmapInfoHeader->biSizeImage,amountOfElements,filePtr);
 
     //make sure bitmap image data was read.
     if(bitmapImage == NULL){
@@ -96,4 +56,14 @@ unsigned char *LoadBitmapFile(char *filename, BITMAPINFOHEADER *bitmapInfoHeader
 
     fclose(filePtr);
     return bitmapImage;
+}
+
+int main(){
+   BITMAPINFOHEADER b;
+   unsigned char* bitmapData;
+   bitmapData = LoadBitmapFile("test.bmp", &b);
+   printf("%u",*bitmapData);
+   
+
+
 }

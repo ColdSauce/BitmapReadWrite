@@ -12,7 +12,11 @@ int main(){
 
 typedef struct tagBITMAPFILEHEADER{
     WORD bfType; //tells you what the file type is.
-}
+    DWORD bfSize; //Size of the bitmap file in bytes
+    WORD bfReserved1; //this is reserved. Must be 0
+    WORD bfReserved2; //this is reserved. Must be 0
+    DWORD bOffBits; //specifies the offset from the bitmapfileheader to the bitmap bits.
+}BITMAPFILEHEADER;
     
 
 
@@ -47,5 +51,30 @@ unsigned char *LoadBitmapFile(char *filename, BITMAPINFOHEADER *bitmapInfoHeader
         return NULL;
     }
 
-    //So now the program has to read the header so that it can see if 
+    //So now the program has to read the header so that it can see if the file is actually a bitmap.
+    //Bitmaps have an id of 0x4D42 so if this file doesn't have that id, it's not a bitmap.
+    fread(&bitmapFileHeader, sizeof(BITMAPFILEHEADER),1,filePtr);
+    if(bitmapFileHeader.bfType != 0x4D42){
+        fclose(filePtr);
+        return NULL;
+    }
+
+    fread(bitmapInfoHeader, sizeof(BITMAPINFOHEADER),1,filePtr);
+
+    //Then we gotta move the "cursor" of the file reader to the actual position where it should be for the bitmap data. This is found in bitmapFileHeader off bits. It gives you the offset in bits.
+    fseek(filePtr, bitmapFileHeader.bfOffBits,SEEK_SET);
+
+    //Then it's important to allocate enough memory for the bitmap image itself.
+    biitmapImage = (unsigned char*)malloc(bitmapInfoHeader->biSizeImage);
+
+    if(!bitmapImage){
+        //if it's 0,
+        free(bitmapImage);
+        fclose(filePtr);
+        return NULL;
+    }
+    //now we actually read the bitmap data.
+    fread(bitmapImage,bitmapInfoHeader->biSizeImage,filePtr);
+
+    //make sure bitmap image data was read.
 }

@@ -1,7 +1,7 @@
 #include "main.h"
 
 int main(){
-    
+        
 }
 
 //The following code is taken from http://stackoverflow.com/questions/14279242/read-bitmap-file-into-structure. 
@@ -77,4 +77,18 @@ unsigned char *LoadBitmapFile(char *filename, BITMAPINFOHEADER *bitmapInfoHeader
     fread(bitmapImage,bitmapInfoHeader->biSizeImage,filePtr);
 
     //make sure bitmap image data was read.
+    if(bitmapImage == NULL){
+        fclose(filePtr);
+        return NULL; 
+    }
+
+    //For some strange reason, bitmaps are BGR so it's important to swap those values.
+    for(int imageIdx = 0; imageIdx < bitmapInfoHeader->biSizeImage;imageIdx+=3){
+        tempRGB = bitmapImage[imageIdx];
+        bitmapImage[imageIdx] = bitmapImage[imageIdx + 2];
+        bitmapImage[imageIdx + 2] = tempRGB;
+    }
+
+    fclose(filePtr);
+    return bitmapImage;
 }

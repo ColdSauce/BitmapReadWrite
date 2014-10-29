@@ -1,7 +1,12 @@
 #include "main.h"
 
 int main(){
-        
+   BITMAPINFOHEADER b;
+   unsigned char* bitmapData;
+   bitmapData = LoadBitmapFile("test.bmp", &b);
+   
+
+
 }
 
 //The following code is taken from http://stackoverflow.com/questions/14279242/read-bitmap-file-into-structure. 

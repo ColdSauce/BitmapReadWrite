@@ -59,10 +59,19 @@ unsigned char *LoadBitmapFile(char *filename, BITMAPINFOHEADER *bitmapInfoHeader
 }
 
 int main(){
+   printf("laaaaaaaaaaaalaaaaaaaa");
    BITMAPINFOHEADER b;
-   unsigned char* bitmapData;
+   printf("laaaaaaaaaaaalaaaaaaaa");
+   unsigned char* bitmapData; 
+   printf("laaaaaaaaaaaalaaaaaaaa");
    bitmapData = LoadBitmapFile("test.bmp", &b);
-   printf("%u",*bitmapData);
+   printf("%d \n", 32);
+   printf("%d \n", &b == NULL);
+   printf("%d \n", b.biSizeImage);
+   for(int i = 0; i < b.biSizeImage;i++){
+       printf("%d" , i); 
+       printf("%u", *bitmapData);
+   }
    
 
 
